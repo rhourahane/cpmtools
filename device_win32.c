@@ -393,7 +393,7 @@ const char *Device_close(struct Device *sb)
             if (!CloseHandle(sb->hdisk)) return strwin32error();
             return NULL; 
     }
-    if (_close(sb->fd)) return strerror(errno);
+    if (close(sb->fd)) return strerror(errno);
     return NULL; 
 }
 /*}}}*/
