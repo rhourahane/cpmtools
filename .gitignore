@@ -23,3 +23,5 @@ mkfs.cpm.1
 Release_*
 Debug_*
 .vs
+packages
+*.user
