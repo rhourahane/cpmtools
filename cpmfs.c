@@ -855,7 +855,7 @@ static int inlineReadSuper(struct cpmSuperBlock *d, const char *format)
     char *linev[16];
     int l;
 
-    char *fmt = strdup(format);
+    char *fmt = _strdup(format);
     for (linec=0; linec<15 && (linev[linec]=strtok(linec ? (char*)0 : fmt,";\n")); ++linec);
     if ((linev[linec]=strtok((char*)0,";\n"))!=(char*)0) ++linec;
     for (l = 0; l < linec; ++l) {

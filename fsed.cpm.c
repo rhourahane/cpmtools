@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) /*{{{*/
 {
   /* variables */ /*{{{*/
   const char *devopts=(const char*)0;
-  char *image;
+  char *image = 0;
   const char *err;
   struct cpmSuperBlock drive;
   struct cpmInode root;

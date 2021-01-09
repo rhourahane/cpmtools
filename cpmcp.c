@@ -9,7 +9,12 @@
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
+
+#if HAVE_WINDOWS_H
+#include <sys/utime.h>
+#else
 #include <utime.h>
+#endif
 
 #include "getopt_.h"
 #include "cpmfs.h"
@@ -267,7 +272,7 @@ int main(int argc, char *argv[])
               buf[j]=c;
             }
             if (text && c==EOF) buf[j++]='\032';
-            if (cpmWrite(&file,buf,j)!=(ssize_t)j)
+            if (cpmWrite(&file,buf,j)!=(size_t)j)
             {
               fprintf(stderr,"%s: can not write %s: %s\n",cmd,dest,boo);
               ohno=1;

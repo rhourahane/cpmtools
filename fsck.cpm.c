@@ -570,7 +570,7 @@ const char cmd[]="fsck.cpm";
 int main(int argc, char *argv[])
 {
   const char *err;
-  const char *image;
+  const char *image = 0;
   const char *format;
   const char *devopts=NULL;
   int c,usage=0;

@@ -20,3 +20,6 @@ fsed.cpm
 fsed.cpm.1
 mkfs.cpm
 mkfs.cpm.1
+Release_*
+Debug_*
+.vs

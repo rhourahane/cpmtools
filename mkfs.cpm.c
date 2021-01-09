@@ -34,7 +34,7 @@ static int mkfs(struct cpmSuperBlock *drive, const char *name, const char *forma
   /*}}}*/
 
   /* open image file */ /*{{{*/
-  if ((fd = open(name, O_BINARY|O_CREAT|O_WRONLY, 0666)) < 0)
+  if ((fd = _open(name, O_BINARY|O_CREAT|O_WRONLY, 0666)) < 0)
   {
     boo=strerror(errno);
     return -1;
@@ -43,10 +43,10 @@ static int mkfs(struct cpmSuperBlock *drive, const char *name, const char *forma
   /* write system tracks */ /*{{{*/
   /* this initialises only whole tracks, so it skew is not an issue */
   trkbytes=drive->secLength*drive->sectrk;
-  for (i=0; i<trkbytes*drive->boottrk; i+=drive->secLength) if (write(fd, bootTracks+i, drive->secLength)!=(ssize_t)drive->secLength)
+  for (i=0; i<trkbytes*drive->boottrk; i+=drive->secLength) if (_write(fd, bootTracks+i, drive->secLength)!=(size_t)drive->secLength)
   {
     boo=strerror(errno);
-    close(fd);
+    _close(fd);
     return -1;
   }
   /*}}}*/
@@ -87,15 +87,15 @@ static int mkfs(struct cpmSuperBlock *drive, const char *name, const char *forma
       firstbuf[27]=firstbuf[31]=min;
     }
   }
-  for (i=0; i<bytes; i+=128) if (write(fd, i==0 ? firstbuf : buf, 128)!=128)
+  for (i=0; i<bytes; i+=128) if (_write(fd, i==0 ? firstbuf : buf, 128)!=128)
   {
     boo=strerror(errno);
-    close(fd);
+    _close(fd);
     return -1;
   }
   /*}}}*/
   /* close image file */ /*{{{*/
-  if (close(fd)==-1)
+  if (_close(fd)==-1)
   {
     boo=strerror(errno);
     return -1;
@@ -158,7 +158,7 @@ const char cmd[]="mkfs.cpm";
 
 int main(int argc, char *argv[]) /*{{{*/
 {
-  char *image;
+  char *image = 0;
   const char *format;
   int c,usage=0;
   struct cpmSuperBlock drive;
@@ -211,18 +211,18 @@ int main(int argc, char *argv[]) /*{{{*/
     int fd;
     size_t size;
 
-    if ((fd=open(boot[c],O_BINARY|O_RDONLY))==-1)
+    if ((fd=_open(boot[c],O_BINARY|O_RDONLY))==-1)
     {
       fprintf(stderr,"%s: can not open %s: %s\n",cmd,boot[c],strerror(errno));
       exit(1);
     }
-    size=read(fd,bootTracks+used,bootTrackSize-used);
+    size=_read(fd,bootTracks+used,bootTrackSize-used);
 #if 0
     fprintf(stderr,"%d %04x %s\n",c,used+0x800,boot[c]);
 #endif
     if (size%drive.secLength) size=(size|(drive.secLength-1))+1;
     used+=size;
-    close(fd);
+    _close(fd);
   }
   if (mkfs(&drive,image,format,label,bootTracks,timeStamps)==-1)
   {

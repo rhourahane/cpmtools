@@ -270,106 +270,31 @@ const char *Device_open(struct Device *sb, const char *filename, int mode, const
     if (strlen(filename) == 2 && filename[1] == ':')    /* Drive name */
     {
         char vname[20];
-        DWORD dwVers;
 
         sb->fd = -1;
-        dwVers = GetVersion();
+        sprintf(vname, "\\\\.\\%s", filename);
+        sb->drvtype = CPMDRV_WINNT;
+        sb->hdisk   = CreateFile(vname,         /* Name */
+                                    w32mode(mode), /* Access mode */
+                                    FILE_SHARE_READ|FILE_SHARE_WRITE, /*Sharing*/
+                                    NULL,          /* Security attributes */ 
+                                    OPEN_EXISTING, /* See MSDN */
+                                    0,             /* Flags & attributes */
+                                    NULL);         /* Template file */
 
-        if (dwVers & 0x80000000L) /* Win32s (3.1) or Win32c (Win95) */
+        if (sb->hdisk != INVALID_HANDLE_VALUE)
         {
-            int lock, driveno, res, permissions;
-            unsigned short drive_flags;
-            MID media;
-
-            vname[0] = toupper(filename[0]);
-            driveno = vname[0] - 'A' + 1;   /* 1=A: 2=B: */
-            sb->drvtype = CPMDRV_WIN95;
-            sb->hdisk   = CreateFile( "\\\\.\\vwin32",
-                                       0,
-                                       0,
-                                       NULL,
-                                       0,
-                                       FILE_FLAG_DELETE_ON_CLOSE,
-                                       NULL );
-            if (!sb->hdisk)
+            sb->fd = 1;   /* Arbitrary value >0 */
+            if (LockVolume(sb->hdisk) == FALSE)    /* Lock drive */
             {
-                return "Failed to open VWIN32 driver.";
-            }
-            if (VolumeCheck(sb->hdisk, driveno, &drive_flags))
-            {
+                char *lboo = strwin32error();
                 CloseHandle(sb->hdisk);
-                return "Invalid drive";
-            } 
-            res = GetMediaID( sb->hdisk, driveno, &media );
-            if ( res )
-            {
-                const char *lboo = NULL;
-
-                if ( res == ERROR_INVALID_FUNCTION && 
-                            (drive_flags & DRIVE_IS_REMOTE )) 
-                     lboo = "Network drive";
-                else if (res == ERROR_ACCESS_DENIED) lboo = "Access denied";
-                /* nb: It's perfectly legitimate for GetMediaID() to fail; most CP/M */
-                /*     CP/M disks won't have a media ID. */ 
-           
-                if (lboo != NULL)
-                {
-                   CloseHandle(sb->hdisk);
-                   return lboo;
-                }
+                sb->fd = -1;
+                return lboo;
             }
-            if (!res && 
-                (!memcmp( media.midFileSysType, "CDROM", 5 ) ||
-                 !memcmp( media.midFileSysType, "CD001", 5 ) ||
-                 !memcmp( media.midFileSysType, "CDAUDIO", 5 )))
-            {
-                CloseHandle(sb->hdisk);
-                return "CD-ROM drive";
-            }
-            if (w32mode(mode) & GENERIC_WRITE)
-            {
-                lock = LEVEL0_LOCK; /* Exclusive access */
-                permissions = 0;
-            }
-            else
-            {
-                lock = LEVEL1_LOCK; /* Allow other processes access */
-                permissions = LEVEL1_LOCK_MAX_PERMISSION;
-            }
-            if (LockLogicalVolume( sb->hdisk, driveno, lock, permissions))
-            {
-                CloseHandle(sb->hdisk);
-                return "Could not acquire a lock on the drive.";
-            }
- 
-            sb->fd = driveno;   /* 1=A: 2=B: etc - we will need this later */
-            
         }
-        else
-        {
-            sprintf(vname, "\\\\.\\%s", filename);
-            sb->drvtype = CPMDRV_WINNT;
-            sb->hdisk   = CreateFile(vname,         /* Name */
-                                     w32mode(mode), /* Access mode */
-                                     FILE_SHARE_READ|FILE_SHARE_WRITE, /*Sharing*/
-                                     NULL,          /* Security attributes */ 
-                                     OPEN_EXISTING, /* See MSDN */
-                                     0,             /* Flags & attributes */
-                                     NULL);         /* Template file */
-
-            if (sb->hdisk != INVALID_HANDLE_VALUE)
-            {
-                sb->fd = 1;   /* Arbitrary value >0 */
-                if (LockVolume(sb->hdisk) == FALSE)    /* Lock drive */
-                {
-                    char *lboo = strwin32error();
-                    CloseHandle(sb->hdisk);
-                    sb->fd = -1;
-                    return lboo;
-                }
-            }
-            else return strwin32error();
-        }
+        else 
+            return strwin32error();
         sb->opened = 1;
         return NULL;
     }
@@ -377,7 +302,7 @@ const char *Device_open(struct Device *sb, const char *filename, int mode, const
     /* Not a floppy. Treat it as a normal file */
 
     mode |= O_BINARY;
-    sb->fd = open(filename, mode);
+    sb->fd = _open(filename, mode);
     if (sb->fd == -1) return strerror(errno);
     sb->drvtype = CPMDRV_FILE;
     sb->opened  = 1;
@@ -468,7 +393,7 @@ const char *Device_close(struct Device *sb)
             if (!CloseHandle(sb->hdisk)) return strwin32error();
             return NULL; 
     }
-    if (close(sb->fd)) return strerror(errno);
+    if (_close(sb->fd)) return strerror(errno);
     return NULL; 
 }
 /*}}}*/
@@ -561,11 +486,11 @@ const char *Device_readSector(const struct Device *drive, int track, int sector,
   }
 
   // Bill Buckels - add drive->offset
-  if (lseek(drive->fd,offset+drive->offset,SEEK_SET)==-1)
+  if (_lseek(drive->fd,offset+drive->offset,SEEK_SET)==-1)
   {
     return strerror(errno);
   }
-  if ((res=read(drive->fd, buf, drive->secLength)) != drive->secLength)
+  if ((res=_read(drive->fd, buf, drive->secLength)) != drive->secLength)
   {
     if (res==-1)
     {
@@ -660,11 +585,11 @@ const char *Device_writeSector(const struct Device *drive, int track, int sector
   }
 
   // Bill Buckels - add drive->offset
-  if (lseek(drive->fd,offset+drive->offset, SEEK_SET)==-1)
+  if (_lseek(drive->fd,offset+drive->offset, SEEK_SET)==-1)
   {
     return strerror(errno);
   }
-  if (write(drive->fd, buf, drive->secLength) == drive->secLength) return NULL;
+  if (_write(drive->fd, buf, drive->secLength) == drive->secLength) return NULL;
   return strerror(errno);
 }
 /*}}}*/

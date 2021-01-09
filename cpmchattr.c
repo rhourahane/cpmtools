@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) /*{{{*/
 {
   /* variables */ /*{{{*/
   const char *err;
-  const char *image;
+  const char *image = 0;
   const char *format;
   const char *devopts=NULL;
   int c,i,usage=0,exitcode=0;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) /*{{{*/
   struct cpmInode root;
   int gargc;
   char **gargv;
-  const char *attrs; 
+  const char *attrs = 0; 
   /*}}}*/
 
   /* parse options */ /*{{{*/

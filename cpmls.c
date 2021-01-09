@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <io.h>
 
 #include "getopt_.h"
 #include "cpmfs.h"
@@ -342,7 +343,7 @@ int main(int argc, char *argv[])
 {
   /* variables */ /*{{{*/
   const char *err;
-  const char *image;
+  const char *image=0;
   const char *format;
   const char *devopts=NULL;
   int c,usage=0;
@@ -358,7 +359,10 @@ int main(int argc, char *argv[])
   /*}}}*/
 
   /* parse options */ /*{{{*/
-  if (!(format=getenv("CPMTOOLSFMT"))) format=FORMAT;
+  if (!(format = getenv("CPMTOOLSFMT")))
+  {
+      format = FORMAT;
+  }
   while ((c=getopt(argc,argv,"cT:f:ih?dDFlA"))!=EOF) switch(c)
   {
     case 'f': format=optarg; break;

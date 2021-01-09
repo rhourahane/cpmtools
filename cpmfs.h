@@ -3,7 +3,12 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#if HAVE_WINDOWS_H
+#include <sys/utime.h>
+#else
 #include <utime.h>
+#endif
 
 #ifdef _WIN32
     #include <windows.h>
