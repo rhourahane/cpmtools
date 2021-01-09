@@ -302,7 +302,7 @@ const char *Device_open(struct Device *sb, const char *filename, int mode, const
     /* Not a floppy. Treat it as a normal file */
 
     mode |= O_BINARY;
-    sb->fd = _open(filename, mode);
+    sb->fd = open(filename, mode);
     if (sb->fd == -1) return strerror(errno);
     sb->drvtype = CPMDRV_FILE;
     sb->opened  = 1;
@@ -486,11 +486,11 @@ const char *Device_readSector(const struct Device *drive, int track, int sector,
   }
 
   // Bill Buckels - add drive->offset
-  if (_lseek(drive->fd,offset+drive->offset,SEEK_SET)==-1)
+  if (lseek(drive->fd,offset+drive->offset,SEEK_SET)==-1)
   {
     return strerror(errno);
   }
-  if ((res=_read(drive->fd, buf, drive->secLength)) != drive->secLength)
+  if ((res=read(drive->fd, buf, drive->secLength)) != drive->secLength)
   {
     if (res==-1)
     {
@@ -585,11 +585,11 @@ const char *Device_writeSector(const struct Device *drive, int track, int sector
   }
 
   // Bill Buckels - add drive->offset
-  if (_lseek(drive->fd,offset+drive->offset, SEEK_SET)==-1)
+  if (lseek(drive->fd,offset+drive->offset, SEEK_SET)==-1)
   {
     return strerror(errno);
   }
-  if (_write(drive->fd, buf, drive->secLength) == drive->secLength) return NULL;
+  if (write(drive->fd, buf, drive->secLength) == drive->secLength) return NULL;
   return strerror(errno);
 }
 /*}}}*/
