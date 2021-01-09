@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <io.h>
 
 #include "getopt_.h"
 #include "cpmfs.h"
