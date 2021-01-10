@@ -85,28 +85,28 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\</OutDir>
-    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)</IntDir>
+    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
     <LibraryPath>C:\Users\Robin\Source\Repos\cpmtools\win32\packages\PDCurses34.3.4.0.1\build\native\lib\win32\v141\static\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\</OutDir>
-    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)</IntDir>
+    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
     <LibraryPath>C:\Users\Robin\Source\Repos\cpmtools\win32\packages\PDCurses34.3.4.0.1\build\native\lib\Win32\v141\static\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\</OutDir>
-    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)</IntDir>
+    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
     <LibraryPath>C:\Users\Robin\Source\Repos\cpmtools\win32\packages\PDCurses34.3.4.0.1\build\native\lib\x64\v141\static\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(PlatformTarget)\</OutDir>
-    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)</IntDir>
+    <IntDir>$(Configuration)_$(PlatformTarget)\$(ProjectName)\</IntDir>
     <LibraryPath>C:\Users\Robin\Source\Repos\cpmtools\win32\packages\PDCurses34.3.4.0.1\build\native\lib\x64\v141\static\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
